@@ -23,8 +23,9 @@ namespace FormsAuthenticationMvc_Demo.Controllers
         {
             if (ModelState.IsValid)
             {
+                string md5Pswd = GetMD5Hash(userModel.UserPassword);
                 bool IsValidUser = db.Users.Any(user => user.UserName.ToLower() ==
-                userModel.UserName.ToLower() && user.UserPassword == user.UserPassword);
+                userModel.UserName.ToLower() && user.UserPassword == md5Pswd);
 
                 if (IsValidUser)
                 {
@@ -59,6 +60,34 @@ namespace FormsAuthenticationMvc_Demo.Controllers
         {
             FormsAuthentication.SignOut();
             return RedirectToAction("Login");
+        }
+
+        public static string GetMD5Hash(string value)
+        {
+            MD5 md5Hasher = MD5.Create();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(value));
+            StringBuilder sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            return sBuilder.ToString();
+        }
+
+        public static string GetMD5Hash2(string value, string transactionKey)
+        {
+            var data = Encoding.UTF8.GetBytes(value);
+            // key
+            var key = Encoding.UTF8.GetBytes(transactionKey);
+
+            // Create HMAC-MD5 Algorithm;
+            var hmac = new HMACMD5(key);
+
+            // Compute hash.
+            var hashBytes = hmac.ComputeHash(data);
+
+            // Convert to HEX string.
+            return System.BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
 }
