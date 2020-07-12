@@ -48,10 +48,13 @@ namespace FormsAuthenticationMvc_Demo.Controllers
         {
             if (ModelState.IsValid)
             {
-                user.UserPassword = GetMD5Hash(user.UserPassword);
-                db.Users.Add(user);
-                db.SaveChanges();
-                return RedirectToAction("Login");
+                var result = new CustomMembership().CreateUser(user.UserName, user.UserPassword, string.Empty, string.Empty,
+                    string.Empty, true, null, out MembershipCreateStatus status);
+
+                if (result != null)
+                {
+                    return RedirectToAction("Login");
+                }
             }
             return View();
         }
