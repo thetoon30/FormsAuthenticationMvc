@@ -150,6 +150,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CustomMembership.cs" />
+    <Compile Include="Models\CustomMembershipUser.cs" />
     <Compile Include="Models\Department.cs">
       <DependentUpon>MyModel.tt</DependentUpon>
     </Compile>
