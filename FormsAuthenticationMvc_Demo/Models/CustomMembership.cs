@@ -52,7 +52,7 @@ namespace FormsAuthenticationMvc_Demo.Models
             //    return null;
             //}
 
-            //MembershipUser user = GetUser(username, true);
+            MembershipUser user = GetUser(username, true);
 
             //if (user == null)
             //{
@@ -77,7 +77,27 @@ namespace FormsAuthenticationMvc_Demo.Models
             //    status = MembershipCreateStatus.DuplicateUserName;
             //}
 
-            throw new NotImplementedException();
+            if (user == null)
+            {
+                using (EmployeeContext db = new EmployeeContext())
+                {
+                    User newUser = new User();
+                    newUser.UserName = username;
+                    newUser.UserPassword = HashPassword(password, "MD5");
+                    db.Users.Add(newUser);
+                    db.SaveChanges();
+
+                    status = MembershipCreateStatus.Success;
+                }
+
+                return GetUser(username, true);
+            }
+            else
+            {
+                status = MembershipCreateStatus.DuplicateUserName;
+
+                return null;
+            };
         }
 
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
@@ -117,7 +137,20 @@ namespace FormsAuthenticationMvc_Demo.Models
 
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
-            throw new NotImplementedException();
+            using (EmployeeContext db = new EmployeeContext())
+            {
+                var user = (from us in db.Users
+                            where string.Compare(username, us.UserName, StringComparison.OrdinalIgnoreCase) == 0
+                            select us).SingleOrDefault();
+
+                if (user == null)
+                {
+                    return null;
+                }
+                var selectedUser = new CustomMembershipUser(user);
+
+                return selectedUser;
+            }
         }
 
         public override string GetUserNameByEmail(string email)
@@ -142,7 +175,25 @@ namespace FormsAuthenticationMvc_Demo.Models
 
         public override bool ValidateUser(string username, string password)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                return false;
+            }
+
+            using (EmployeeContext db = new EmployeeContext())
+            {
+                var user = (from us in db.Users
+                            where string.Compare(username, us.UserName, StringComparison.OrdinalIgnoreCase) == 0
+                            && string.Compare(password, us.UserPassword, StringComparison.OrdinalIgnoreCase) == 0
+                            select us).FirstOrDefault();
+
+                return (user != null) ? true : false;
+            }
+        }
+
+        public static string HashPassword(string password, string formst)
+        {
+            return FormsAuthentication.HashPasswordForStoringInConfigFile(password, "MD5").ToLower();
         }
     }
 }
