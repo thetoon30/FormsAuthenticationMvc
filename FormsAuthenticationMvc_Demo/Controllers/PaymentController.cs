@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FormsAuthenticationMvc_Demo.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,7 +7,7 @@ using System.Web.Mvc;
 
 namespace FormsAuthenticationMvc_Demo.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [CustomAuthorize(Roles = "Admin")]
     public class PaymentController : Controller
     {
         // GET: Payment

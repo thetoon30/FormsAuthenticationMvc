@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace FormsAuthenticationMvc_Demo.Controllers
 {
-    [Authorize]
+    [CustomAuthorize]
     public class EmployeesController : Controller
     {
         private EmployeeContext db = new EmployeeContext();
